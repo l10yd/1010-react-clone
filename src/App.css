@@ -1,0 +1,95 @@
+/* app.css 
+добавить: темная тема (v), кнопка reset(v), звуки, улучшить анимации, сохранения(v)
+*/
+body {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 85vh;
+  background-color: #f0f0f0; 
+  overflow-y: hidden; /* Скрывает вертикальную полосу прокрутки */
+}
+
+.App {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  text-align: center;
+}
+
+.tile {
+  width: 50px;
+  height: 50px;
+  background-color: transparent;
+  border: 1px solid #ccc;
+  border-radius: 10px  
+}
+
+.shape-block { 
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  border: 1px double #ccc;
+  border-radius: 10px;
+}
+
+
+.scoreboard {
+  position: absolute;
+  top: -60px;  
+  z-index: 1; 
+  user-select: none;
+  cursor: default;
+  font-size: 24px;
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.7);
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+button {
+  position: absolute;
+  top: -55px;
+  z-index: 1; 
+  user-select: none;
+  cursor: pointer; /* кнопка кликабельна */
+  font-size: 15px;
+  font-family: Calibri;
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.7);
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  border-radius: 5px;
+  transition: background-color 0.2s; /* плавный переход */  
+}
+
+button:hover {
+  background-color: #555; /* при наведении на кнопку */
+}
+
+button:active {
+  background-color: #333; /* при нажатии на кнопку */
+}
+
+.reset-button {
+  right: 50px;
+}
+
+.theme-button {
+  left: 50px;  
+}
+
+.gameboard {
+  width: 550px;
+  height: 550px; 
+  position: relative;
+  border: 5px solid black;
+  padding: 10px;
+  boxSizing: border-box;
+  zIndex: 1;
+}
