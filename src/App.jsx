@@ -27,6 +27,7 @@ function App() {
   const [shapePosition, setShapePosition] = useState({ x: 0, y: 0 });
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [grid, setGrid] = useState(Array(10).fill(Array(10).fill(null)));
+  const [hiddenCells, setHiddenCells] = useState(Array(10).fill(Array(10).fill(false)));
   const [randomShapes, setRandomShapes] = useState([]);
   const [newShapesInitialPosition, setNewShapesInitialPosition] = useState({ x: -90, y: 550 });
   const [score, setScore] = useState(0);
@@ -318,6 +319,7 @@ function App() {
     }
   };
 
+  
   //вспомогательный для таймаутов на promise
   const sleep = (ms) => {
     return new Promise((resolve) => {
@@ -407,8 +409,10 @@ function App() {
   const handleMouseMove = (e) => {
     if (isDragging && selectedShapeColor) {
       const { clientX, clientY } = e;
-      setShapePosition({ x: clientX - dragOffset.x || e.touches[0].clientX - dragOffset.x, 
-                        y: clientY - dragOffset.y || e.touches[0].clientY - dragOffset.y});}    
+      /*setShapePosition({ x: clientX - dragOffset.x || e.touches[0].clientX - dragOffset.x, 
+                        y: clientY - dragOffset.y || e.touches[0].clientY - dragOffset.y});}*/
+      setShapePosition({ x: clientX - dragOffset.x,  y: clientY - dragOffset.y});
+    }
   };
 
   const handleMouseEnter = () => {
@@ -430,8 +434,8 @@ function App() {
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onMouseEnter={handleMouseEnter}
-      onTouchUp={handleMouseUp}
-      onTouchMove={handleMouseMove}
+      /*onTouchUp={handleMouseUp}
+      onTouchMove={handleMouseMove}*/
       >      
 
       <div className="scoreboard">
@@ -456,7 +460,7 @@ function App() {
         <div key={rowIndex} style={{ display: "flex" }}>
           {rowArr.map((color, colIndex) => (
             <div
-              className="tile"
+              className={`tile ${hiddenCells[rowIndex][colIndex] ? 'hide' : ''}`}
               key={colIndex}
               style={{
                 backgroundColor: color || "transparent",
@@ -481,7 +485,7 @@ function App() {
             }}
             draggable="true"
             onMouseDown={(e) => handleMouseDown(e, dx * 50, dy * 50, shapeIndex, shapeColor.color)}
-            onTouchDown={(e) => handleMouseDown(e, dx * 50, dy * 50, shapeIndex, shapeColor.color)}
+            /*onTouchDown={(e) => handleMouseDown(e, dx * 50, dy * 50, shapeIndex, shapeColor.color)}*/
           />
         ))
       )}
