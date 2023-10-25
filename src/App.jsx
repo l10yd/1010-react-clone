@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
+import Grid from "./Grid";
 
+//фигуры, массивы состоят из позиций клеток
 const shapes = [
   [[0, 0], [0, 1], [0, 2]], // 3-horizontal line
   [[0, 0], [1, 0], [2, 0]], // 3-vertical line
@@ -19,6 +21,49 @@ const shapes = [
   [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]], //3-square
 ];
 
+//цветовые темы для клеток и фона
+const themes = {
+  light: {
+    colors: {
+      red: "red",
+      orange: "orange",
+      yellow: "yellow",
+      green: "green",
+      blue: "blue",
+      indigo: "indigo",
+      violet: "violet",
+    },
+    background: "#f0f0f0",
+    tileborder: "#ccc",
+  },
+  dark: {
+    colors: {
+      red: "#ff5733",
+      orange: "#ffa600",
+      yellow: "#ffd700",
+      green: "#57ff33",
+      blue: "#3364ff",
+      indigo: "#8333ff",
+      violet: "#ff33ff",
+    },
+    background: "#222",
+    tileborder: "black",
+  },
+  neon: {
+    colors: {
+      red: "#FF00FF",
+      orange: "#FF00CC",
+      yellow: "#9900FF",
+      green: "#CC00FF",
+      blue: "#9D00FF",
+      indigo: "#CC00FF",
+      violet: "#6E0DD0",
+    },
+    background: "#000000",
+    tileborder: "#222",
+  },
+};
+
 function App() {
   //стейт хуки из переменной и сеттера
   const [isDragging, setIsDragging] = useState(false);
@@ -33,15 +78,15 @@ function App() {
   const [score, setScore] = useState(0);
   const [maxScore, setMaxScore] = useState(0);
   const [isClearingGrid, setIsClearingGrid] = useState(false);
-  const [currentTheme, setCurrentTheme] = useState(localStorage.getItem('theme') || 'light'); 
+  const [currentTheme, setCurrentTheme] = useState(localStorage.getItem('theme') || 'light');
   const [tileBorderColor, setTileBorderColor] = useState("#ccc");
 
   //таймер для курсора мыши при наведении на фигуру
   let leaveTimeout = 0;
 
   //сработает только 1 раз ([]) при старте приложения
-  //загружает score, maxScore, игровое поле, фигуры (создает их, если 1 раз)
-  useEffect(() => { 
+  //загружает score, maxScore, игровое поле, фигуры (создает их, если 1 раз), тему (светлая по дефолту)
+  useEffect(() => {
     const savedScore = parseInt(localStorage.getItem('score'), 10);
     const savedMaxScore = parseInt(localStorage.getItem('maxScore'), 10);
     const savedTheme = localStorage.getItem('theme');
@@ -66,49 +111,6 @@ function App() {
       generateRandomShapes();
     }
   }, []);
-
-  //цветовые темы для клеток и фона
-  const themes = {
-    light: {
-      colors: {
-        red: "red",
-        orange: "orange",
-        yellow: "yellow",
-        green: "green",
-        blue: "blue",
-        indigo: "indigo",
-        violet: "violet",        
-      },
-      background: "#f0f0f0",
-      tileborder: "#ccc",
-    },
-    dark: {
-      colors: {
-        red: "#ff5733",
-        orange: "#ffa600",
-        yellow: "#ffd700",
-        green: "#57ff33",
-        blue: "#3364ff",
-        indigo: "#8333ff",
-        violet: "#ff33ff",
-      },
-      background: "#222",  
-      tileborder: "black",
-    },
-    neon: {
-      colors: {
-        red: "#FF00FF",
-        orange: "#FF00CC",
-        yellow: "#9900FF",
-        green: "#CC00FF",
-        blue: "#9D00FF",
-        indigo: "#CC00FF",
-        violet: "#6E0DD0",
-      },
-      background: "#000000",
-      tileborder: "#222",
-    },
-  };  
 
   //случайный цвет, вызывается при генерации 3х рандомных фигур  
   const getRandomColor = () => {
@@ -140,7 +142,7 @@ function App() {
     const newTheme = themeKeys[(currentIndex + 1) % themeKeys.length];
     setCurrentTheme(newTheme);
     localStorage.setItem('theme', newTheme);
-    
+
     // Обновляет цвета фигур
     const updatedRandomShapes = randomShapes.map((shapeData) => {
       return {
@@ -266,10 +268,9 @@ function App() {
       }
     }
 
-    // Wait for all rows and columns to be cleared before resolving the promise
+    // ждем выполнения очистки всех строк и столбцов 
     await Promise.all([...clearedRowsPromises, ...clearedColumnsPromises]);
 
-    // Continue with the rest of the logic
     const clearedRowsAndColumns = { rows: [], columns: [] };
 
     for (let row = 0; row < 10; row++) {
@@ -294,6 +295,7 @@ function App() {
     for (let i = 0; i < 10; i++) {
       clearColumnPromises.push(clearColumn(grid, i, 100));
     }
+    //ждем очистки всех столбцов
     await Promise.all([...clearColumnPromises]);
   };
 
@@ -314,12 +316,11 @@ function App() {
       if (grid[row][col] !== null) {
         grid[row][col] = null;
         setGrid([...grid]);
-        await sleep(time); // Подождать перед удалением следующей клетки
+        await sleep(time);
       }
     }
   };
 
-  
   //вспомогательный для таймаутов на promise
   const sleep = (ms) => {
     return new Promise((resolve) => {
@@ -334,7 +335,7 @@ function App() {
     setIsDragging(true);
     setSelectedShapeIndex(index);
     setSelectedShapeColor(color);
-    // Установите начальную позицию фигуры и смещение точки клика относительно начальной позиции
+    // устанавливаем начальную позицию фигуры и смещение точки клика относительно начальной позиции
     const initialPosition = randomShapes[index].position;
     setShapePosition({ x: initialPosition.x, y: initialPosition.y });
     setDragOffset({
@@ -352,7 +353,7 @@ function App() {
       const row = Math.floor(y / 50);
       const col = Math.floor(x / 50);
 
-      // Check if the selected shape can be placed
+      // проверяет, можно ли поставить фигуру на выбранное место, возвращает bool
       const shape = randomShapes[selectedShapeIndex].shape;
       const validPlacement = shape.every(([dx, dy]) => {
         const newRow = row + dx;
@@ -360,8 +361,8 @@ function App() {
         return newRow >= 0 && newRow < grid.length && newCol >= 0 && newCol < grid[0].length && grid[newRow][newCol] === null;
       });
 
+      //если можно, то заполняет клетки цветом фигуры
       if (validPlacement) {
-        // Place the selected shape on the grid
         const newGrid = grid.map((rowArr, rowIndex) => {
           return rowArr.map((cell, colIndex) => {
             if (shape.some(([dx, dy]) => rowIndex === row + dx && colIndex === col + dy)) {
@@ -377,11 +378,13 @@ function App() {
         setRandomShapes(updatedShapes);
         localStorage.setItem('randomShapes', JSON.stringify(updatedShapes));
 
+        //сброс фигуры
         setSelectedShapeIndex(null);
         setSelectedShapeColor(null);
 
         // Опустошение полностью заполненных строк и столбцов
         const clearedRowsAndColumns = await checkAndClearRowsAndColumns(newGrid);
+        // а также возвращает количество очищенных 
         const cleared = clearedRowsAndColumns.rows.length + clearedRowsAndColumns.columns.length;
 
         setGrid(newGrid);
@@ -399,7 +402,7 @@ function App() {
         }
       }
 
-      // Reset the selected shape index and color
+      //сброс фигуры
       setSelectedShapeIndex(null);
       setSelectedShapeColor(null);
     }
@@ -411,7 +414,7 @@ function App() {
       const { clientX, clientY } = e;
       /*setShapePosition({ x: clientX - dragOffset.x || e.touches[0].clientX - dragOffset.x, 
                         y: clientY - dragOffset.y || e.touches[0].clientY - dragOffset.y});}*/
-      setShapePosition({ x: clientX - dragOffset.x,  y: clientY - dragOffset.y});
+      setShapePosition({ x: clientX - dragOffset.x, y: clientY - dragOffset.y });
     }
   };
 
@@ -429,14 +432,14 @@ function App() {
   };
 
   return (
-    <div className="App" 
-      onMouseUp={handleMouseUp} 
+    <div className="App"
+      onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onMouseEnter={handleMouseEnter}
-      /*onTouchUp={handleMouseUp}
-      onTouchMove={handleMouseMove}*/
-      >      
+    /*onTouchUp={handleMouseUp}
+    onTouchMove={handleMouseMove}*/
+    >
 
       <div className="scoreboard">
         <span>
@@ -456,21 +459,10 @@ function App() {
         </button>
       </div>
 
-      {grid.map((rowArr, rowIndex) => (
-        <div key={rowIndex} style={{ display: "flex" }}>
-          {rowArr.map((color, colIndex) => (
-            <div
-              className={`tile ${hiddenCells[rowIndex][colIndex] ? 'hide' : ''}`}
-              key={colIndex}
-              style={{
-                backgroundColor: color || "transparent",
-                borderColor: tileBorderColor,
-              }}
-            />
-          ))}
-        </div>
-      ))}
-      
+      {/* рендер сетки клеток */}      
+      <Grid grid={grid} tileBorderColor={tileBorderColor} />
+
+      {/* рендер 3х случайных фигур */}
       {randomShapes.map((shapeColor, shapeIndex) =>
         shapeColor.shape.map(([dx, dy], index) => (
           <div
@@ -485,7 +477,7 @@ function App() {
             }}
             draggable="true"
             onMouseDown={(e) => handleMouseDown(e, dx * 50, dy * 50, shapeIndex, shapeColor.color)}
-            /*onTouchDown={(e) => handleMouseDown(e, dx * 50, dy * 50, shapeIndex, shapeColor.color)}*/
+          /*onTouchDown={(e) => handleMouseDown(e, dx * 50, dy * 50, shapeIndex, shapeColor.color)}*/
           />
         ))
       )}
